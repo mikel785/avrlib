@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "nobootseq.hpp"
 #include "buffer.hpp"
+#include "usart_base.hpp"
 
 namespace avrlib {
 
@@ -82,8 +83,9 @@ public:
 				this->process_tx();
 				sei();
 			}
-
 			m_tx_buffer.push(v);
+			if(m_async_tx)
+				m_usart.dre_interrupt(uart_intr_med);
 		}
 		else
 		{
@@ -117,13 +119,18 @@ public:
 
 	bool intr_rx()
 	{
+		if(m_usart.overflow())
+			++m_overflow;
 		if(m_usart.frame_error())
 		{
 			m_usart.recv();
 			return false;
 		}
 		value_type v = m_bootseq.check(m_usart.recv());
-		m_rx_buffer.push(v);
+		if(!m_rx_buffer.push(v))
+		{
+			++m_overflow;
+		}
 		return true;
 	}
 
@@ -148,6 +155,10 @@ public:
 			m_tx_buffer.pop();
 			return true;
 		}
+		else
+		{
+			m_usart.dre_interrupt(uart_intr_off);
+		}
 		return false;
 	}
 
@@ -155,6 +166,9 @@ public:
 	{
 		return TxBufferSize - m_tx_buffer.size() > size;
 	}
+	
+	overflow_type overflow() const { return m_overflow; }
+	void clear_overflow() { m_overflow = 0; }
 
 	typedef buffer<value_type, RxBufferSize> rx_buffer_type;
 	rx_buffer_type & rx_buffer() { return m_rx_buffer; }
@@ -164,12 +178,17 @@ public:
 
 	usart_type & usart() { return m_usart; }
 	usart_type const & usart() const { return m_usart; }
+		
+	void async_tx(const bool& en) { m_async_tx = en; }
+	bool async_tx() const { return m_async_tx; }
 
 private:
 	usart_type m_usart;
 	buffer<value_type, RxBufferSize> m_rx_buffer;
 	buffer<value_type, TxBufferSize==0?1:TxBufferSize> m_tx_buffer;
 	bootseq_type m_bootseq;
+	volatile overflow_type m_overflow;
+	volatile bool m_async_tx;
 };
 
 }
