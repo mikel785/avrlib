@@ -6,6 +6,13 @@ namespace avrlib {
 template <typename Port, int Pin>
 struct pin
 {
+	typedef Port port;
+
+	enum {
+		inverted = false,
+		pin_number = Pin
+	};
+
 	static void set(bool value = true)
 	{
 		if (value)
@@ -46,6 +53,13 @@ struct pin
 template <typename Port, int Pin>
 struct inv_pin
 {
+	typedef Port port;
+
+	enum {
+		inverted = true,
+		pin_number = Pin
+	};
+
 	static void set(bool value = true)
 	{
 		if (value)

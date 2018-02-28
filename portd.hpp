@@ -15,6 +15,10 @@ struct portd
 
 	static uint8_t dir() { return DDRD; }
 	static void dir(uint8_t v) { DDRD = v; }
+
+	static volatile uint8_t* get_address() { return &PORTD; }
+
+	static volatile uint8_t* get_pin_address() { return &PIND; }
 };
 
 }

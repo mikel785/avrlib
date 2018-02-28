@@ -15,6 +15,10 @@ struct portg
 
 	static uint8_t dir() { return DDRG; }
 	static void dir(uint8_t v) { DDRG = v; }
+
+	static uint8_t* get_address() { return &PORTG; }
+
+	static volatile uint8_t* get_pin_address() { return &PING; }
 };
 
 }

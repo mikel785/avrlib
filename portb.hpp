@@ -15,6 +15,11 @@ struct portb
 
 	static uint8_t dir() { return DDRB; }
 	static void dir(uint8_t v) { DDRB = v; }
+
+	static volatile uint8_t* get_address() { return &PORTB; }
+
+	static volatile uint8_t* get_pin_address() { return &PINB; }
+
 };
 
 }

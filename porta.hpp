@@ -15,6 +15,10 @@ struct porta
 
 	static uint8_t dir() { return DDRA; }
 	static void dir(uint8_t v) { DDRA = v; }
+
+	static volatile uint8_t* get_address() { return &PORTA; }
+
+	static volatile uint8_t* get_pin_address() { return &PINA; }
 };
 
 }

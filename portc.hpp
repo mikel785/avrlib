@@ -15,6 +15,10 @@ struct portc
 
 	static uint8_t dir() { return DDRC; }
 	static void dir(uint8_t v) { DDRC = v; }
+
+	static volatile uint8_t* get_address() { return &PORTC; }
+
+	static volatile uint8_t* get_pin_address() { return &PINC; }
 };
 
 }
